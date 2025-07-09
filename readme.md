@@ -1,9 +1,6 @@
 # Building a NativeActivity Android App in C: Process Overview and Guide
 
-<video width="320" height="240" controls>
-  <source src="rec.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<img src="./ss.jpg"/>
 
 This document explains the **step-by-step process** to create, build, package, and run a pure C Android app using the NativeActivity API, without any Java code. It also includes a simple example and the necessary commands.
 
