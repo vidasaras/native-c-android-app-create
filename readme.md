@@ -1,29 +1,29 @@
 # Building a NativeActivity Android App in C: Process Overview and Guide
 
-<img src="./ss.jpg"/>
+<img src="./ss.jpg"\>
 
 This document explains the **step-by-step process** to create, build, package, and run a pure C Android app using the NativeActivity API, without any Java code. It also includes a simple example and the necessary commands.
 
----
+-----
 
 ## What is a NativeActivity?
 
-- NativeActivity is an Android framework class that allows you to write your entire Android app in native C/C++ code.
-- It eliminates the need for Java UI code by providing a native entry point and lifecycle callbacks.
-- Useful for games, multimedia apps, or performance-critical applications.
+  - NativeActivity is an Android framework class that allows you to write your entire Android app in native C/C++ code.
+  - It eliminates the need for Java UI code by providing a native entry point and lifecycle callbacks.
+  - Useful for games, multimedia apps, or performance-critical applications.
 
----
+-----
 
 ## High-Level Process
 
-1. **Write native C code** implementing `android_main` and handling lifecycle and input events.
-2. **Prepare AndroidManifest.xml** specifying `android.app.NativeActivity` as the activity and linking your native library.
-3. **Build the native code** into a shared library (`libyourlib.so`) using the Android NDK (`ndk-build` or CMake).
-4. **Package the APK** with your native library, manifest, resources, and a minimal `classes.dex` file.
-5. **Sign and align the APK** to make it installable on Android devices.
-6. **Install and run the APK** on a device or emulator.
+1.  **Write native C code** implementing `android_main` and handling lifecycle and input events.
+2.  **Prepare AndroidManifest.xml** specifying `android.app.NativeActivity` as the activity and linking your native library.
+3.  **Build the native code** into a shared library (`libyourlib.so`) using the Android NDK (`ndk-build` or CMake).
+4.  **Package the APK** with your native library, manifest, resources, and a minimal `classes.dex` file.
+5.  **Sign and align the APK** to make it installable on Android devices.
+6.  **Install and run the APK** on a device or emulator.
 
----
+-----
 
 ## Key Files and Components
 
@@ -31,16 +31,16 @@ This document explains the **step-by-step process** to create, build, package, a
 |------------------------------|-----------------------------------------------------------|
 | `hello.c`                    | Native C source implementing `android_main` and rendering |
 | `AndroidManifest.xml`        | Declares the app and specifies NativeActivity             |
-| `jni/Android.mk`             | NDK build script to compile native code                  |
-| `jni/Application.mk`         | NDK build config (ABI, platform version)                 |
-| `android_native_app_glue.*`  | Glue code to interface with NativeActivity lifecycle     |
-| `Dummy.java`                 | Minimal Java class to generate `classes.dex`             |
-| `classes.dex`                | Dalvik bytecode file required by Android APKs            |
-| `aapt`                       | Android packaging tool                                   |
-| `zipalign`                   | APK alignment tool                                       |
-| `apksigner`                  | APK signing tool                                         |
+| `jni/Android.mk`             | NDK build script to compile native code                   |
+| `jni/Application.mk`         | NDK build config (ABI, platform version)                  |
+| `android_native_app_glue.*`  | Glue code to interface with NativeActivity lifecycle      |
+| `Dummy.java`                 | Minimal Java class to generate `classes.dex`              |
+| `classes.dex`                | Dalvik bytecode file required by Android APKs             |
+| `aapt`                       | Android packaging tool                                    |
+| `zipalign`                   | APK alignment tool                                        |
+| `apksigner`                  | APK signing tool                                          |
 
----
+-----
 
 ## Example Minimal `AndroidManifest.xml`
 
@@ -67,46 +67,146 @@ This document explains the **step-by-step process** to create, build, package, a
 </manifest>
 ```
 
----
+-----
 
 ## Overview of the Native C Code (`hello.c`)
 
-* Implements `android_main(struct android_app* app)` as the app entry.
-* Uses `android_native_app_glue` to handle lifecycle and input.
-* Draws text or graphics on the screen using `ANativeWindow`.
-* Runs a main loop that processes events and renders frames.
-* Keeps the app alive until the user quits.
+  * Implements `android_main(struct android_app* app)` as the app entry.
+  * Uses `android_native_app_glue` to handle lifecycle and input.
+  * Draws text or graphics on the screen using `ANativeWindow`.
+  * Runs a main loop that processes events and renders frames.
+  * Keeps the app alive until the user quits.
 
----
+-----
+
+## Prerequisites
+
+### 1. Java JDK
+
+Install OpenJDK (recommended for Ubuntu):
+
+```sh
+sudo apt update
+sudo apt install default-jdk
+```
+
+### 2. Android SDK (Command Line Tools)
+
+Download the latest "Command line tools only" ZIP from the official Android developer site:
+[https://developer.android.com/studio\#downloads](https://developer.android.com/studio#downloads)
+
+Extract it to a directory, e.g., `~/android-sdk/cmdline-tools`.
+
+```sh
+mkdir -p ~/android-sdk/cmdline-tools
+unzip commandlinetools-linux-*.zip -d ~/android-sdk/cmdline-tools
+```
+
+Set environment variables (add to your `~/.bashrc`):
+
+```sh
+export ANDROID_HOME=$HOME/android-sdk
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/tools/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/build-tools/34.0.0
+```
+
+Then run:
+
+```sh
+source ~/.bashrc
+```
+
+Install essential SDK components:
+
+```sh
+sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+```
+
+### 3. Android NDK
+
+Install via SDK Manager (recommended):
+
+```sh
+sdkmanager --sdk_root=$ANDROID_HOME "ndk-bundle"
+```
+
+Or specify a version, e.g.:
+
+```sh
+sdkmanager --sdk_root=$ANDROID_HOME "ndk;26.3.11579264"
+```
+
+Or download manually:
+Download the NDK ZIP from the official NDK page, extract it, and set the `NDK_HOME` environment variable:
+[https://developer.android.com/ndk/downloads](https://developer.android.com/ndk/downloads)
+
+```sh
+export NDK_HOME=$HOME/android-ndk-r26
+export PATH=$PATH:$NDK_HOME
+```
+
+### 5. Verify Installations
+
+Java:
+
+```sh
+javac -version
+```
+
+SDK tools:
+
+```sh
+sdkmanager --list
+adb version
+aapt version
+apksigner --version
+```
+
+NDK:
+
+```sh
+$NDK_HOME/ndk-build --version
+```
+
+-----
 
 ## Build and Packaging Commands
 
 Assuming your project structure is set and you have:
 
-* `jni/hello.c`, `jni/Android.mk`, `jni/Application.mk`
-* `android_native_app_glue.c/h` in `jni/`
-* `AndroidManifest.xml`, `res/values/strings.xml`
-* `Dummy.java` with minimal class (`public class Dummy {}`)
+  * `jni/hello.c`, `jni/Android.mk`, `jni/Application.mk`
+  * `android_native_app_glue.c/h` in `jni/`
+  * `AndroidManifest.xml`, `res/values/strings.xml`
+  * `Dummy.java` with minimal class (`public class Dummy {}`)
 
 You can use the makefile:
-    Clean build artifacts:
-        ```sh
-        make clean
-        ```
-    Build the APK (native lib + package + sign):
-        ```sh
-        make build
-        ```
-    Install the APK on your connected device:
-        ```sh
-        make install
-        ```
-    Run the app on your device:
-        ```sh
-        make run
-        ```
+Clean build artifacts:
+
+```sh
+make clean
+```
+
+Build the APK (native lib + package + sign):
+
+```sh
+make build
+```
+
+Install the APK on your connected device:
+
+```sh
+make install
+```
+
+Run the app on your device:
+
+```sh
+make run
+```
 
 or follow the guide:
+
 ### 1. Build native library
 
 ```sh
@@ -160,17 +260,13 @@ adb install -r HelloWorld-signed.apk
 adb shell am start -n com.example.helloworld/android.app.NativeActivity
 ```
 
----
+-----
 
 ## Notes and Tips
 
-* **`classes.dex` is mandatory**, even for native-only apps, to satisfy Android package requirements.
-* Use the **native_app_glue** library from the NDK to simplify lifecycle management.
-* The **package name** in the manifest and the `am start` command must match.
-* You can view logs using `adb logcat` to debug native code.
-* For graphics, you can draw directly on `ANativeWindow` or use OpenGL ES.
-* The minimal font and drawing code can be replaced with more advanced rendering as needed.
-
----
-
-
+  * **`classes.dex` is mandatory**, even for native-only apps, to satisfy Android package requirements.
+  * Use the **native\_app\_glue** library from the NDK to simplify lifecycle management.
+  * The **package name** in the manifest and the `am start` command must match.
+  * You can view logs using `adb logcat` to debug native code.
+  * For graphics, you can draw directly on `ANativeWindow` or use OpenGL ES.
+  * The minimal font and drawing code can be replaced with more advanced rendering as needed.

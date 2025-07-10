@@ -4,6 +4,8 @@ APK_UNALIGNED = $(APP_NAME).unaligned.apk
 APK_ALIGNED = $(APP_NAME).apk
 APK_SIGNED = $(APP_NAME)-signed.apk
 
+ANDROID_HOME = $(HOME)/dev/thirdparty/android-sdk
+
 # === Files ===
 JNI_DIR = jni
 LIB_OUTPUT_DIR = libs/armeabi-v7a
@@ -33,7 +35,7 @@ build:
 	d8 --output . $(DUMMY_CLASS)
 
 	@echo "Packaging APK..."
-	aapt package -f -M AndroidManifest.xml -S res -I /home/vid/android-sdk/platforms/android-34/android.jar -F $(APK_UNALIGNED)
+	aapt package -f -M AndroidManifest.xml -S res -I $(ANDROID_HOME)/platforms/android-34/android.jar -F $(APK_UNALIGNED)
 
 	@echo "Adding native library and classes.dex..."
 	mkdir -p lib/armeabi-v7a
@@ -53,4 +55,6 @@ install:
 
 run:
 	@echo "Launching app..."
+	@echo "Beware that this command is only valid for this particular application as the id of the application is in AndroidManifest.xml"
+	# this is relative to the AndroidManifest.xml
 	adb shell am start -n com.example.helloworld/android.app.NativeActivity
