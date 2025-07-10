@@ -1,6 +1,6 @@
 # Building a NativeActivity Android App in C: Process Overview and Guide
 
-<img src="./ss.jpg"\>
+<img src="./ss.jpg"/>
 
 This document explains the **step-by-step process** to create, build, package, and run a pure C Android app using the NativeActivity API, without any Java code. It also includes a simple example and the necessary commands.
 
